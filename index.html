@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Realtime Database Example</title>
+    <script src="https://www.static.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.static.com/firebasejs/9.6.1/firebase-database.js"></script>
+    <style>
+        table {
+            width: 50%;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .error {
+            color: red;
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center;">Users List</h1>
+    <div id="error" class="error"></div>
+    <table id="usersTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+            </tr>
+        </thead>
+        <tbody id="usersBody"></tbody>
+    </table>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            databaseURL: "YOUR_DATABASE_URL",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        const app = firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        function fetchUsers() {
+            const usersBody = document.getElementById("usersBody");
+            const errorDiv = document.getElementById("error");
+
+            database.ref("users").get()
+                .then((snapshot) => {
+                    if (snapshot.exists()) {
+                        const users = snapshot.val();
+                        Object.keys(users).forEach((key) => {
+                            const row = `<tr>
+                                <td>${users[key].name}</td>
+                                <td>${users[key].email}</td>
+                            </tr>`;
+                            usersBody.innerHTML += row;
+                        });
+                    } else {
+                        errorDiv.textContent = "No data available.";
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error fetching data:", error);
+                    errorDiv.textContent = "Error fetching data. Please try again later.";
+                });
+        }
+
+        fetchUsers();
+    </script>
+</body>
+</html>
